@@ -3,11 +3,12 @@ package com.dziekanat.springApp.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.Set;
 
 @Setter
 @Getter
 @Entity
-@Table(name = "group")
+@Table(name = "grupa")
 public class Group {
 
     @Id
@@ -20,6 +21,12 @@ public class Group {
 
     @Column(name = "semester", nullable = false)
     private Integer semester;
+
+    @OneToMany(mappedBy = "group")
+    private Set<Classes> classes;
+
+    @OneToMany(mappedBy = "group")
+    private Set<Student> students;
 
     public Group() {
         super();

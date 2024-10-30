@@ -19,6 +19,10 @@ public class Student {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "group_id", referencedColumnName = "id")
+    private Group group;
+
     @Column(name = "student_index", unique = true, nullable = false)
     private String studentIndex;
 
@@ -35,8 +39,9 @@ public class Student {
         super();
     }
 
-    public Student(User user, String studentIndex, Integer yearOfStudy, String faculty, String specialization) {
+    public Student(User user, Group group, String studentIndex, Integer yearOfStudy, String faculty, String specialization) {
         this.user = user;
+        this.group = group;
         this.studentIndex = studentIndex;
         this.yearOfStudy = yearOfStudy;
         this.faculty = faculty;

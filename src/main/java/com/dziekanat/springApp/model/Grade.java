@@ -3,7 +3,6 @@ package com.dziekanat.springApp.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDate;
 
 @Setter
@@ -44,7 +43,7 @@ public class Grade {
 
     @Override
     public String toString() {
-        return "Grades{" +
+        return "Grade{" +
                 "id=" + id +
                 ", student=" + student.getFullName() +
                 ", classes=" + classes.getName() +
