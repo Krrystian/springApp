@@ -86,24 +86,25 @@ public class StudentController {
     public ResponseEntity<Student> updateStudent(@PathVariable Integer id, @RequestBody Student updatedStudent) {
         return studentRepository.findById(id)
                 .map(student -> {
-                    User user = student.getUser();
-                    user.setFirstName(updatedStudent.getUser().getFirstName());
-                    user.setLastName(updatedStudent.getUser().getLastName());
-                    user.setUsername(updatedStudent.getUser().getUsername());
-                    user.setPassword(updatedStudent.getUser().getPassword());
-                    user.setRole(updatedStudent.getUser().getRole());
-                    userRepository.save(user);
-
-                    student.setStudentIndex(updatedStudent.getStudentIndex());
-                    student.setYearOfStudy(updatedStudent.getYearOfStudy());
-                    student.setFaculty(updatedStudent.getFaculty());
-                    student.setSpecialization(updatedStudent.getSpecialization());
+                    if (updatedStudent.getStudentIndex() != null) {
+                        student.setStudentIndex(updatedStudent.getStudentIndex());
+                    }
+                    if (updatedStudent.getYearOfStudy() != null) {
+                        student.setYearOfStudy(updatedStudent.getYearOfStudy());
+                    }
+                    if (updatedStudent.getFaculty() != null) {
+                        student.setFaculty(updatedStudent.getFaculty());
+                    }
+                    if (updatedStudent.getSpecialization() != null) {
+                        student.setSpecialization(updatedStudent.getSpecialization());
+                    }
 
                     studentRepository.save(student);
                     return ResponseEntity.ok(student);
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable Integer id) {

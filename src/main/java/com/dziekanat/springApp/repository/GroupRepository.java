@@ -1,4 +1,9 @@
 package com.dziekanat.springApp.repository;
 
-public interface GroupRepository {
+import com.dziekanat.springApp.model.Group;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface GroupRepository extends JpaRepository<Group, Integer> {
 }

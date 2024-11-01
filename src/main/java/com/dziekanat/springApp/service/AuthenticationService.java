@@ -1,9 +1,11 @@
 package com.dziekanat.springApp.service;
 
 
+import com.dziekanat.springApp.model.Admin;
 import com.dziekanat.springApp.model.AuthenticationResponse;
 import com.dziekanat.springApp.model.Token;
 import com.dziekanat.springApp.model.User;
+import com.dziekanat.springApp.repository.AdminRepository;
 import com.dziekanat.springApp.repository.TokenRepository;
 import com.dziekanat.springApp.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,10 +15,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 
 @Service
 public class AuthenticationService {
@@ -134,6 +139,5 @@ public class AuthenticationService {
         }
 
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-
     }
 }

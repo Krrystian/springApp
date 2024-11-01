@@ -44,11 +44,19 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/login/**", "/register/**", "/refresh_token/**", "/user/getAll").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/student/**").hasAnyAuthority("ADMIN","PRACOWNIK")
-                        .requestMatchers(HttpMethod.DELETE, "/student/**").hasAuthority("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/student/**", "/group/**").hasAnyAuthority("ADMIN","PRACOWNIK")
                         .requestMatchers(HttpMethod.POST, "/announcement/**").hasAuthority("ADMIN")
+
+                        .requestMatchers(HttpMethod.DELETE, "/student/**", "/announcement/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/group/**").hasAnyAuthority("ADMIN", "PRACOWNIK")
+
+                        .requestMatchers(HttpMethod.PUT, "/announcement/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/group/**").hasAnyAuthority("ADMIN", "PRACOWNIK")
+
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("/student/**", "/announcement/**").hasAnyAuthority("STUDENT", "ADMIN", "PRACOWNIK")
+                        .requestMatchers("/student/**", "/announcement/**", "/group/**").hasAnyAuthority("STUDENT", "ADMIN", "PRACOWNIK")
+
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsServiceImp)

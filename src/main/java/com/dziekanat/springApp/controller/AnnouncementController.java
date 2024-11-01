@@ -5,49 +5,71 @@ import com.dziekanat.springApp.model.Announcement;
 import com.dziekanat.springApp.model.Admin;
 import com.dziekanat.springApp.repository.AnnouncementRepository;
 import com.dziekanat.springApp.repository.AdminRepository;
+import com.dziekanat.springApp.service.AdminService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-//TODO: SPRAWDZ REQUESTY
+import java.util.stream.Collectors;
+
+
 @RestController
 @RequestMapping("/announcement")
 public class AnnouncementController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AnnouncementController.class);
+
     private final AnnouncementRepository announcementRepository;
-    private final AdminRepository adminRepository;
+    private final AdminService adminService;
 
-    public AnnouncementController(AnnouncementRepository announcementRepository, AdminRepository adminRepository) {
+    public AnnouncementController(AnnouncementRepository announcementRepository, AdminRepository adminRepository, AdminService adminService) {
         this.announcementRepository = announcementRepository;
-        this.adminRepository = adminRepository;
+        this.adminService = adminService;
     }
 
-    // Tworzenie ogłoszenia
+    // Create announcement
     @PostMapping
-    public ResponseEntity<Announcement> createAnnouncement(@RequestParam String title,
-                                                           @RequestParam String content,
-                                                           @RequestParam Integer adminId) {
-        Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
+    public ResponseEntity<AnnouncementDTO> createAnnouncement(@RequestBody AnnouncementDTO announcementDTO) {
+        logger.info("Received request to create announcement with title: {}", announcementDTO.getTitle());
 
-        Announcement announcement = new Announcement(title, content, admin);
+        Admin admin = adminService.getAuthenticatedAdmin();
+        logger.debug("Authenticated admin: {}", admin);
+
+        Announcement announcement = new Announcement(announcementDTO.getTitle(), announcementDTO.getContent(), admin);
         announcementRepository.save(announcement);
-        return ResponseEntity.ok(announcement);
+        logger.info("Announcement created with ID: {}", announcement.getId());
+
+        return ResponseEntity.ok(new AnnouncementDTO(announcement.getId(), announcement.getTitle(), announcement.getContent(), announcement.getAdmin().getFullName()));
     }
 
-    // Pobranie wszystkich ogłoszeń
     @GetMapping
-    public ResponseEntity<List<Announcement>> getAllAnnouncements() {
-        List<Announcement> announcements = announcementRepository.findAll();
-        return ResponseEntity.ok(announcements);
+    public ResponseEntity<List<AnnouncementDTO>> getAllAnnouncements() {
+        logger.info("Received request to fetch all announcements");
+
+        List<AnnouncementDTO> announcementDTOs = announcementRepository.findAll().stream()
+                .map(announcement -> new AnnouncementDTO(
+                        announcement.getId(),
+                        announcement.getTitle(),
+                        announcement.getContent(),
+                        announcement.getAdmin().getUser().getUsername()
+                ))
+                .collect(Collectors.toList());
+
+        logger.info("Fetched {} announcements", announcementDTOs.size());
+        return ResponseEntity.ok(announcementDTOs);
     }
 
+    // Get announcement by ID
     @GetMapping("/{id}")
     public ResponseEntity<AnnouncementDTO> getAnnouncementById(@PathVariable Integer id) {
+        logger.info("Received request to fetch announcement with ID: {}", id);
+
         return announcementRepository.findById(id)
                 .map(announcement -> {
-                    Admin admin = announcement.getAdmin(); // Zakładam, że w ogłoszeniu jest pole admin
-                    String authorFullName = admin.getFullName(); // Uzyskanie pełnego imienia i nazwiska autora
+                    Admin admin = announcement.getAdmin();
+                    String authorFullName = admin.getFullName();
 
                     AnnouncementDTO announcementDTO = new AnnouncementDTO(
                             announcement.getId(),
@@ -56,34 +78,58 @@ public class AnnouncementController {
                             authorFullName
                     );
 
+                    logger.info("Announcement found with ID: {}", id);
                     return ResponseEntity.ok(announcementDTO);
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> {
+                    logger.warn("Announcement with ID: {} not found", id);
+                    return ResponseEntity.notFound().build();
+                });
     }
 
-
-    // Aktualizacja ogłoszenia
+    // Update announcement
     @PutMapping("/{id}")
-    public ResponseEntity<Announcement> updateAnnouncement(@PathVariable Integer id,
+    public ResponseEntity<AnnouncementDTO> updateAnnouncement(@PathVariable Integer id,
                                                            @RequestBody Announcement announcementDetails) {
+        logger.info("Received request to update announcement with ID: {}", id);
+
         return announcementRepository.findById(id)
                 .map(announcement -> {
-                    announcement.setTitle(announcementDetails.getTitle());
-                    announcement.setContent(announcementDetails.getContent());
+                    logger.debug("Updating announcement with new details: {}", announcementDetails);
+
+                    if (announcementDetails.getTitle() != null) {
+                        announcement.setTitle(announcementDetails.getTitle());
+                    }
+                    if (announcementDetails.getContent() != null) {
+                        announcement.setContent(announcementDetails.getContent());
+                    }
                     Announcement updatedAnnouncement = announcementRepository.save(announcement);
-                    return ResponseEntity.ok(updatedAnnouncement);
+
+                    logger.info("Announcement updated with ID: {}", updatedAnnouncement.getId());
+
+                    AnnouncementDTO announcementDTO = new AnnouncementDTO(updatedAnnouncement.getId(), updatedAnnouncement.getTitle(),updatedAnnouncement.getContent(), updatedAnnouncement.getAdmin().getFullName());
+                    return ResponseEntity.ok(announcementDTO);
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> {
+                    logger.warn("Announcement with ID: {} not found for update", id);
+                    return ResponseEntity.notFound().build();
+                });
     }
 
-    // Usunięcie ogłoszenia
+    // Delete announcement
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteAnnouncement(@PathVariable Integer id) {
+        logger.info("Received request to delete announcement with ID: {}", id);
+
         return announcementRepository.findById(id)
                 .map(announcement -> {
                     announcementRepository.delete(announcement);
+                    logger.info("Announcement deleted with ID: {}", id);
                     return ResponseEntity.noContent().build();
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> {
+                    logger.warn("Announcement with ID: {} not found for deletion", id);
+                    return ResponseEntity.notFound().build();
+                });
     }
 }

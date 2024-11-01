@@ -40,7 +40,6 @@ public class Announcement {
         this.admin = admin;
     }
 
-
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
