@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "class")
-public class Classes {
+public class Class {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,11 +26,11 @@ public class Classes {
     @JoinColumn(name = "group_id", referencedColumnName = "id", nullable = false)
     private Group group;
 
-    public Classes() {
+    public Class() {
         super();
     }
 
-    public Classes(String name, Employee employee, Group group) {
+    public Class(String name, Employee employee, Group group) {
         this.name = name;
         this.employee = employee;
         this.group = group;
@@ -38,7 +38,7 @@ public class Classes {
 
     @Override
     public String toString() {
-        return "Classes{" +
+        return "Class{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", employee=" + employee.getFullName() +

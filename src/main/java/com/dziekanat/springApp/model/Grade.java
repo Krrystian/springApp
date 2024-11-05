@@ -22,7 +22,7 @@ public class Grade {
 
     @ManyToOne
     @JoinColumn(name = "classes_id", referencedColumnName = "id", nullable = false)
-    private Classes classes;
+    private Class classes;
 
     @Column(name = "grade", nullable = false)
     private Double grade;
@@ -34,7 +34,7 @@ public class Grade {
         super();
     }
 
-    public Grade(Student student, Classes classes, Double grade, LocalDate date) {
+    public Grade(Student student, Class classes, Double grade, LocalDate date) {
         this.student = student;
         this.classes = classes;
         this.grade = grade;

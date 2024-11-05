@@ -30,7 +30,7 @@ public class GroupController {
         this.groupRepository = groupRepository;
         this.studentRepository = studentRepository;
     }
-    
+
 //TODO:TEST
     @GetMapping
     public ResponseEntity<List<GroupDTO>> getAllGroups() {

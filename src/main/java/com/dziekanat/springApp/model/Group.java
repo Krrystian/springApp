@@ -23,7 +23,7 @@ public class Group {
     private Integer semester;
 
     @OneToMany(mappedBy = "group")
-    private Set<Classes> classes;
+    private Set<Class> classes;
 
     @OneToMany(mappedBy = "group")
     private Set<Student> students;

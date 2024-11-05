@@ -1,4 +1,16 @@
 package com.dziekanat.springApp.dto;
 
-public class ClassDTO {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class ClassDTO extends GroupDTO  {
+    private Integer id;
+    private String name;
+    private GroupDTO group;
 }

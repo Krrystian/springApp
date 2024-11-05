@@ -9,7 +9,4 @@ import java.util.Optional;
 
 @Repository
 public interface ClassRepository extends JpaRepository<Admin, Integer> {
-
-    @Query("SELECT a FROM Admin a WHERE a.user.username = :username")
-    Optional<Admin> findByUserUsername(String username);
 }
