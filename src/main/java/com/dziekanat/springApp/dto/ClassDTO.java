@@ -7,10 +7,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class ClassDTO extends GroupDTO  {
     private Integer id;
     private String name;
-    private GroupDTO group;
+    private Integer employeeId;
+    private Integer group;  //ewentualnie GroupDTO ?
+
+    public ClassDTO(Integer id, String name, Integer employeeId, Integer group) {
+        this.id = id;
+        this.name = name;
+        this.employeeId = employeeId;
+        this.group = group;
+    }
 }
