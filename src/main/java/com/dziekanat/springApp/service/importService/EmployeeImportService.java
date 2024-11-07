@@ -20,11 +20,9 @@ public class EmployeeImportService {
     private EmployeeRepository employeeRepository;
     private UserRepository userRepository;
 
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Employee importEmployee(EmployeeDTO employeeDTO) {
-
         User user = userRepository.findById(employeeDTO.getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
         Employee employee = new Employee();
         employee.setUser(user);
@@ -36,7 +34,6 @@ public class EmployeeImportService {
     }
 
     public List<Employee> importEmployees(List<EmployeeDTO> employeeDTOs) {
-
         List<Employee> employees = employeeDTOs.stream()
                 .map(this::importEmployee)
                 .toList();
