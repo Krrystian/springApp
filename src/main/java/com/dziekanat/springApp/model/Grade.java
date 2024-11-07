@@ -28,7 +28,7 @@ public class Grade {
     private Double grade;
 
     @Column(name = "date", nullable = false)
-    private LocalDate date;
+    private LocalDate date = LocalDate.now();
 
     public Grade() {
         super();

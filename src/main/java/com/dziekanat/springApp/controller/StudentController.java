@@ -26,6 +26,7 @@ public class StudentController {
         this.userRepository = userRepository;
     }
 
+    //TODO: DO POPRAWY ABY NIE ZWRACAŁO HASEŁ
     @GetMapping
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
@@ -51,7 +52,6 @@ public class StudentController {
             return ResponseEntity.ok(studentDTO);
         }
     }
-
 
     @PostMapping()
     public ResponseEntity<StudentDTO> createStudent(@RequestBody Student student, @RequestParam Integer userId) {
@@ -83,7 +83,7 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Student> updateStudent(@PathVariable Integer id, @RequestBody Student updatedStudent) {
+    public ResponseEntity<StudentDTO> updateStudent(@PathVariable Integer id, @RequestBody Student updatedStudent) {
         return studentRepository.findById(id)
                 .map(student -> {
                     if (updatedStudent.getStudentIndex() != null) {
@@ -100,11 +100,20 @@ public class StudentController {
                     }
 
                     studentRepository.save(student);
-                    return ResponseEntity.ok(student);
+                    StudentDTO studentDTO = new StudentDTO(
+                            student.getUser().getId(),
+                            student.getUser().getFirstName(),
+                            student.getUser().getLastName(),
+                            student.getUser().getUsername(),
+                            student.getStudentIndex(),
+                            student.getYearOfStudy(),
+                            student.getFaculty(),
+                            student.getSpecialization()
+                    );
+                    return ResponseEntity.ok(studentDTO);
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable Integer id) {

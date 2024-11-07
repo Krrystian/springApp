@@ -1,4 +1,4 @@
-package com.dziekanat.springApp.exportService;
+package com.dziekanat.springApp.service.exportService;
 
 import com.dziekanat.springApp.dto.StudentDTO;
 import com.dziekanat.springApp.model.Student;
@@ -26,7 +26,7 @@ public class StudentExportService {
     public void exportAllStudentsNamesAndSurnames(String filePath) throws IOException {
         List<Student> students = studentRepository.findAll();
         List<StudentDTO> studentNames = students.stream()
-                .map(student -> new StudentDTO(student.getStudentIndex(), student.getFullName()))
+                .map(student -> new StudentDTO(student.getStudentIndex()))
                 .toList();
         objectMapper.writeValue(new File(filePath), studentNames);
     }

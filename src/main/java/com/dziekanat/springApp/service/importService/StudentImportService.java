@@ -1,4 +1,4 @@
-package com.dziekanat.springApp.importService;
+package com.dziekanat.springApp.service.importService;
 
 import com.dziekanat.springApp.dto.StudentDTO;
 import com.dziekanat.springApp.model.Student;
@@ -17,13 +17,8 @@ import java.util.List;
 @Service
 public class StudentImportService {
 
-    @Autowired
     private StudentRepository studentRepository;
-
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private AdminService adminService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();

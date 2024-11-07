@@ -53,7 +53,7 @@ public class AnnouncementController {
                         announcement.getId(),
                         announcement.getTitle(),
                         announcement.getContent(),
-                        announcement.getAdmin().getUser().getUsername()
+                        announcement.getAdmin().getFullName()
                 ))
                 .collect(Collectors.toList());
 

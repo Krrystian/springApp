@@ -1,17 +1,21 @@
 package com.dziekanat.springApp.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+
 public class StudentDTO extends UserDTO {
     private String studentIndex;
     private Integer yearOfStudy;
     private String faculty;
     private String specialization;
-
-    private String fullName;    //??
+    private String fullName;
 
     public StudentDTO(Integer id, String firstName, String lastName, String username, String studentIndex, Integer yearOfStudy, String faculty, String specialization) {
         super(id, firstName, lastName, username);
@@ -20,10 +24,9 @@ public class StudentDTO extends UserDTO {
         this.faculty = faculty;
         this.specialization = specialization;
     }
-
-    public StudentDTO(String studentIndex, String fullName) {
+    public StudentDTO(String studentIndex) {
         this.studentIndex = studentIndex;
-        this.fullName = getFullName();  //??
+        this.fullName = getFullName();
     }
 }
 

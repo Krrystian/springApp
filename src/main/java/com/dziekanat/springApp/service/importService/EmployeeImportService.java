@@ -1,4 +1,4 @@
-package com.dziekanat.springApp.importService;
+package com.dziekanat.springApp.service.importService;
 
 import com.dziekanat.springApp.dto.EmployeeDTO;
 import com.dziekanat.springApp.model.Employee;
@@ -17,22 +17,15 @@ import java.util.List;
 @Service
 public class EmployeeImportService {
 
-    @Autowired
     private EmployeeRepository employeeRepository;
-
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private AdminService adminService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Employee importEmployee(EmployeeDTO employeeDTO) {
-        adminService.getAuthenticatedAdmin();
 
         User user = userRepository.findById(employeeDTO.getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
-
         Employee employee = new Employee();
         employee.setUser(user);
         employee.setPosition(employeeDTO.getPosition());
@@ -43,7 +36,6 @@ public class EmployeeImportService {
     }
 
     public List<Employee> importEmployees(List<EmployeeDTO> employeeDTOs) {
-        adminService.getAuthenticatedAdmin();
 
         List<Employee> employees = employeeDTOs.stream()
                 .map(this::importEmployee)
@@ -52,7 +44,6 @@ public class EmployeeImportService {
     }
 
     public void importEmployeesFromJson(File jsonFile) throws IOException {
-        adminService.getAuthenticatedAdmin();
 
         List<EmployeeDTO> employeeDTOs = objectMapper.readValue(jsonFile,
                 objectMapper.getTypeFactory().constructCollectionType(List.class, EmployeeDTO.class));

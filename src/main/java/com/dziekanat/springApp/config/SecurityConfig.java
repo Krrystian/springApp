@@ -45,17 +45,23 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/login/**", "/register/**", "/refresh_token/**", "/user/getAll").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/student/**", "/group/**").hasAnyAuthority("ADMIN","PRACOWNIK")
-                        .requestMatchers(HttpMethod.POST, "/announcement/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/student/**", "/group/**", "/classes/**").hasAnyAuthority("ADMIN","PRACOWNIK")
+                        .requestMatchers(HttpMethod.POST, "/announcement/**", "/employee/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/grades/**").hasAuthority("PRACOWNIK")
 
-                        .requestMatchers(HttpMethod.DELETE, "/student/**", "/announcement/**").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/group/**").hasAnyAuthority("ADMIN", "PRACOWNIK")
+                        .requestMatchers(HttpMethod.DELETE, "/student/**", "/announcement/**", "/employee/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/group/**", "/classes/**").hasAnyAuthority("ADMIN", "PRACOWNIK")
+                        .requestMatchers(HttpMethod.DELETE, "/grades/**").hasAuthority("PRACOWNIK")
 
-                        .requestMatchers(HttpMethod.PUT, "/announcement/**").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/group/**").hasAnyAuthority("ADMIN", "PRACOWNIK")
+                        .requestMatchers(HttpMethod.PUT, "/announcement/**", "/employee/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/group/**", "/classes/**", "/grades/**").hasAnyAuthority("ADMIN", "PRACOWNIK")
 
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("/student/**", "/announcement/**", "/group/**").hasAnyAuthority("STUDENT", "ADMIN", "PRACOWNIK")
+                        .requestMatchers("/admin/**", "/grades", "/export/**", "/import/**").hasAuthority("ADMIN")
+                        .requestMatchers("/grades/class/**", "/grades/student/**").hasAnyAuthority("ADMIN", "PRACOWNIK")
+
+
+                        .requestMatchers("/student/**", "/announcement/**", "/group/**", "/classes/**", "/employee/**").hasAnyAuthority("STUDENT", "ADMIN", "PRACOWNIK")
+                        .requestMatchers("/grades/student/**").hasAuthority("STUDENT")
 
                         .anyRequest().authenticated()
                 )

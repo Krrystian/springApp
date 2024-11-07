@@ -1,12 +1,18 @@
 package com.dziekanat.springApp.controller;
 
 import com.dziekanat.springApp.dto.ClassDTO;
+import com.dziekanat.springApp.dto.GroupDTO;
 import com.dziekanat.springApp.model.Class;
+import com.dziekanat.springApp.model.Employee;
+import com.dziekanat.springApp.model.Group;
 import com.dziekanat.springApp.repository.ClassRepository;
+import com.dziekanat.springApp.repository.EmployeeRepository;
+import com.dziekanat.springApp.repository.GroupRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -14,9 +20,13 @@ import java.util.stream.Collectors;
 public class ClassController {
 
     private final ClassRepository classRepository;
+    private final EmployeeRepository employeeRepository;
+    private final GroupRepository groupRepository;
 
-    public ClassController(ClassRepository classRepository) {
+    public ClassController(ClassRepository classRepository, EmployeeRepository employeeRepository, GroupRepository groupRepository) {
         this.classRepository = classRepository;
+        this.employeeRepository = employeeRepository;
+        this.groupRepository = groupRepository;
     }
 
     @GetMapping
@@ -25,8 +35,8 @@ public class ClassController {
         List<ClassDTO> classDTOs = classes.stream().map(c -> new ClassDTO(
                 c.getId(),
                 c.getName(),
-                c.getEmployee().getId(),
-                c.getGroup().getId()
+                c.getEmployee().getFullName(),
+                c.getGroup().getName()
         )).collect(Collectors.toList());
         return ResponseEntity.ok(classDTOs);
     }
@@ -37,38 +47,57 @@ public class ClassController {
                 .map(c -> new ClassDTO(
                         c.getId(),
                         c.getName(),
-                        c.getEmployee().getId(),
-                        c.getGroup().getId()
+                        c.getEmployee().getFullName(),
+                        c.getGroup().getName()
                 ))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<ClassDTO> createClass(@RequestBody Class classEntity) {
-        Class savedClass = classRepository.save(classEntity);
-        ClassDTO classDTO = new ClassDTO(
-                savedClass.getId(),
-                savedClass.getName(),
-                savedClass.getEmployee().getId(),
-                savedClass.getGroup().getId()
-        );
-        return ResponseEntity.ok(classDTO);
+    public ResponseEntity<ClassDTO> createClass(
+            @RequestBody Class classEntity,
+            @RequestParam Integer employeeId,
+            @RequestParam Integer groupId) {
+
+        Optional<Employee> employeeOptional = employeeRepository.findById(employeeId);
+        Optional<Group> groupOptional = groupRepository.findById(groupId);
+        if (employeeOptional.isPresent() && groupOptional.isPresent()) {
+            classEntity.setEmployee(employeeOptional.get());
+            classEntity.setGroup(groupOptional.get());
+            Class savedClass = classRepository.save(classEntity);
+
+            ClassDTO classDTO = new ClassDTO(
+                    savedClass.getId(),
+                    savedClass.getName(),
+                    savedClass.getEmployee().getFullName(),
+                    savedClass.getGroup().getName()
+            );
+            return ResponseEntity.ok(classDTO);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ClassDTO> updateClass(@PathVariable Integer id, @RequestBody Class classDetails) {
         return classRepository.findById(id)
                 .map(existingClass -> {
-                    existingClass.setName(classDetails.getName());
-                    existingClass.setEmployee(classDetails.getEmployee());
-                    existingClass.setGroup(classDetails.getGroup());
+                    if(classDetails.getName() != null){
+                        existingClass.setName(classDetails.getName());
+                    }
+                    if(classDetails.getEmployee() != null){
+                        existingClass.setEmployee(classDetails.getEmployee());
+                    }
+                    if(classDetails.getGroup() != null){
+                        existingClass.setGroup(classDetails.getGroup());
+                    }
                     Class updatedClass = classRepository.save(existingClass);
                     ClassDTO classDTO = new ClassDTO(
                             updatedClass.getId(),
                             updatedClass.getName(),
-                            updatedClass.getEmployee().getId(),
-                            updatedClass.getGroup().getId()
+                            updatedClass.getEmployee().getFullName(),
+                            updatedClass.getGroup().getName()
                     );
                     return ResponseEntity.ok(classDTO);
                 })
@@ -90,8 +119,8 @@ public class ClassController {
                 .map(c -> new ClassDTO(
                         c.getId(),
                         c.getName(),
-                        c.getEmployee().getId(), // Assuming you want to return the employee's ID
-                        c.getGroup() != null ? c.getGroup().getId() : null // Return group ID or null if not set
+                        c.getEmployee().getFullName(),
+                        c.getGroup().getName()
                 ))
                 .collect(Collectors.toList());
 

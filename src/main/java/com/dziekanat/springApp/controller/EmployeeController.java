@@ -2,6 +2,7 @@ package com.dziekanat.springApp.controller;
 
 import com.dziekanat.springApp.dto.EmployeeDTO;
 import com.dziekanat.springApp.model.Employee;
+import com.dziekanat.springApp.model.Role;
 import com.dziekanat.springApp.model.User;
 import com.dziekanat.springApp.repository.EmployeeRepository;
 import com.dziekanat.springApp.repository.UserRepository;
@@ -55,11 +56,14 @@ public class EmployeeController {
 
         if (userOptional.isPresent()) {
             User existingUser = userOptional.get();
+            if (!existingUser.getRole().equals(Role.PRACOWNIK)) {
+                return ResponseEntity.badRequest().body(null);
+            }
             employee.setUser(existingUser);
 
             Employee savedEmployee = employeeRepository.save(employee);
             logger.info("Employee created successfully: {}", savedEmployee);
-
+            logger.info("user: {}", savedEmployee.getUser().getFirstName());
             EmployeeDTO employeeDTO = new EmployeeDTO(
                     savedEmployee.getUser().getId(),
                     savedEmployee.getUser().getFirstName(),
@@ -97,16 +101,31 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateEmployee(@PathVariable Integer id, @RequestBody Employee employeeDetails) {
+    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable Integer id, @RequestBody Employee updatedEmployee) {
         logger.debug("Updating employee with ID: {}", id);
         return employeeRepository.findById(id)
                 .map(employee -> {
-                    employee.setPosition(employeeDetails.getPosition());
-                    employee.setFaculty(employeeDetails.getFaculty());
-                    employee.setAcademicTitle(employeeDetails.getAcademicTitle());
-                    Employee updatedEmployee = employeeRepository.save(employee);
-                    logger.info("Employee updated successfully: {}", updatedEmployee);
-                    return ResponseEntity.ok("Employee updated successfully");
+                    if(updatedEmployee.getPosition() != null){
+                        employee.setPosition(updatedEmployee.getPosition());
+                    }
+                    if(updatedEmployee.getFaculty() != null){
+                        employee.setFaculty(updatedEmployee.getFaculty());
+                    }
+                    if(updatedEmployee.getAcademicTitle() != null) {
+                        employee.setAcademicTitle(updatedEmployee.getAcademicTitle());
+                    }
+                    employeeRepository.save(employee);
+
+                    EmployeeDTO employeeDTO = new EmployeeDTO(
+                            employee.getUser().getId(),
+                            employee.getUser().getFirstName(),
+                            employee.getUser().getLastName(),
+                            employee.getUser().getUsername(),
+                            employee.getPosition(),
+                            employee.getFaculty(),
+                            employee.getAcademicTitle()
+                    );
+                    return ResponseEntity.ok(employeeDTO);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

@@ -9,7 +9,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class GroupDTO {
     private Integer id;
     private String groupName;

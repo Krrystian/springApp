@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,9 +37,7 @@ public class GradeController {
         List<Grade> grades = gradeRepository.findAll();
         List<GradeDTO> gradeDTOs = grades.stream().map(grade -> new GradeDTO(
                 grade.getId(),
-                grade.getStudent().getId(),
                 grade.getStudent().getFullName(),
-                grade.getClasses().getId(),
                 grade.getClasses().getName(),
                 grade.getGrade(),
                 grade.getDate()
@@ -48,41 +47,22 @@ public class GradeController {
         return ResponseEntity.ok(gradeDTOs);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<GradeDTO> getGradeById(@PathVariable Integer id) {
-        return gradeRepository.findById(id)
-                .map(grade -> new GradeDTO(
-                        grade.getId(),
-                        grade.getStudent().getId(),
-                        grade.getStudent().getFullName(),
-                        grade.getClasses().getId(),
-                        grade.getClasses().getName(),
-                        grade.getGrade(),
-                        grade.getDate()
-                ))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
     @PostMapping
-    public ResponseEntity<GradeDTO> createGrade(@RequestBody GradeDTO gradeDTO) {
-        Optional<Student> studentOptional = studentRepository.findById(gradeDTO.getStudentId());
-        Optional<Class> classOptional = classRepository.findById(gradeDTO.getClassId());
+    public ResponseEntity<GradeDTO> createGrade(@RequestBody Grade grade, @RequestParam Integer studentId, @RequestParam Integer classId) {
+        Optional<Student> studentOptional = studentRepository.findById(studentId);
+        Optional<Class> classOptional = classRepository.findById(classId);
 
         if (studentOptional.isPresent() && classOptional.isPresent()) {
-            Grade grade = new Grade(
-                    studentOptional.get(),
-                    classOptional.get(),
-                    gradeDTO.getGrade(),
-                    gradeDTO.getDate()
-            );
-            Grade savedGrade = gradeRepository.save(grade);
+            if (grade.getDate() == null) {
+                grade.setDate(LocalDate.now());
+            }
+            grade.setStudent(studentOptional.get());
+            grade.setClasses(classOptional.get());
 
+            Grade savedGrade = gradeRepository.save(grade);
             GradeDTO responseDTO = new GradeDTO(
                     savedGrade.getId(),
-                    savedGrade.getStudent().getId(),
                     savedGrade.getStudent().getFullName(),
-                    savedGrade.getClasses().getId(),
                     savedGrade.getClasses().getName(),
                     savedGrade.getGrade(),
                     savedGrade.getDate()
@@ -100,15 +80,16 @@ public class GradeController {
 
         if (gradeOptional.isPresent()) {
             Grade grade = gradeOptional.get();
-            grade.setGrade(gradeDTO.getGrade());
-            grade.setDate(gradeDTO.getDate());
+            if (gradeDTO.getDate() != null) {
+                grade.setDate(gradeDTO.getDate());
+            }
+            if (gradeDTO.getGrade() != null) {
+                grade.setGrade(gradeDTO.getGrade());
+            }
             Grade updatedGrade = gradeRepository.save(grade);
-
             GradeDTO responseDTO = new GradeDTO(
                     updatedGrade.getId(),
-                    updatedGrade.getStudent().getId(),
                     updatedGrade.getStudent().getFullName(),
-                    updatedGrade.getClasses().getId(),
                     updatedGrade.getClasses().getName(),
                     updatedGrade.getGrade(),
                     updatedGrade.getDate()
@@ -138,24 +119,11 @@ public class GradeController {
 
         List<GradeDTO> gradeDTOs = grades.stream().map(grade -> new GradeDTO(
                 grade.getId(),
-                grade.getStudent().getId(),
                 grade.getStudent().getFullName(),
-                grade.getClasses().getId(),
                 grade.getClasses().getName(),
                 grade.getGrade(),
                 grade.getDate()
         )).collect(Collectors.toList());
-        
-        //ewetualnie stworzyć nowy konstruktor z samymi ocenami i studentami
-        /*
-        List<GradeDTO> gradeDTOs = grades.stream().map(grade -> new GradeDTO(
-                grade.getId(),
-                grade.getStudent().getId(),
-                grade.getClasses().getId(),
-                grade.getGrade(),
-                grade.getDate()
-        )).collect(Collectors.toList());
-         */
         return ResponseEntity.ok(gradeDTOs);
     }
 
@@ -165,9 +133,7 @@ public class GradeController {
 
         List<GradeDTO> gradeDTOs = grades.stream().map(grade -> new GradeDTO(
                 grade.getId(),
-                grade.getStudent().getId(),
                 grade.getStudent().getFullName(),
-                grade.getClasses().getId(),
                 grade.getClasses().getName(),
                 grade.getGrade(),
                 grade.getDate()
