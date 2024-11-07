@@ -38,8 +38,6 @@ public class EmployeeExportService {
                 .collect(Collectors.toList());
     }
 
-
-
     public List<EmployeeDTO> exportEmployeesByFaculty(String faculty) {
         List<Employee> employees = employeeRepository.findByFaculty(faculty);
         return employees.stream()
