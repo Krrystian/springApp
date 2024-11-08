@@ -15,4 +15,10 @@ public class UserDTO {
     private String lastName;
     private String username;
 
+    public UserDTO(Integer id,String firstName, String lastName) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
 }

@@ -47,7 +47,8 @@ public class StudentController {
                     student.getStudentIndex(),
                     student.getYearOfStudy(),
                     student.getFaculty(),
-                    student.getSpecialization()
+                    student.getSpecialization(),
+                    student.getGroup().getId()
             );
             return ResponseEntity.ok(studentDTO);
         }
@@ -74,7 +75,8 @@ public class StudentController {
                     savedStudent.getStudentIndex(),
                     savedStudent.getYearOfStudy(),
                     savedStudent.getFaculty(),
-                    savedStudent.getSpecialization()
+                    savedStudent.getSpecialization(),
+                    savedStudent.getGroup() != null ? savedStudent.getGroup().getId() : null
             );
             return ResponseEntity.ok(studentDTO);
         } else {
@@ -108,7 +110,8 @@ public class StudentController {
                             student.getStudentIndex(),
                             student.getYearOfStudy(),
                             student.getFaculty(),
-                            student.getSpecialization()
+                            student.getSpecialization(),
+                            student.getGroup().getId()
                     );
                     return ResponseEntity.ok(studentDTO);
                 })

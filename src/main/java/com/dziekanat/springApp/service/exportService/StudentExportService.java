@@ -26,23 +26,16 @@ public class StudentExportService {
 
     public List<StudentDTO> exportAllStudentsNamesAndSurnames() {
         List<Student> students = studentRepository.findAll();
-        List<StudentDTO> studentNames = students.stream()
+        return students.stream()
                 .map(student -> new StudentDTO(
                         student.getId(),
                         student.getUser().getFirstName(),
-                        student.getUser().getLastName(),
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
+                        student.getUser().getLastName()
                 )).toList();
-        return studentNames;
     }
 
     public List<StudentDTO> exportAllStudents() {
         List<Student> students = studentRepository.findAll();
-
         return students.stream()
                 .map(student -> new StudentDTO(
                             student.getId(),
@@ -52,14 +45,14 @@ public class StudentExportService {
                             student.getStudentIndex(),
                             student.getYearOfStudy(),
                             student.getFaculty(),
-                            student.getSpecialization()
+                            student.getSpecialization(),
+                            student.getGroup() != null ? student.getGroup().getId() : null
                 )).collect(Collectors.toList());
     }
 
     public StudentDTO exportStudentById(Integer studentId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new IllegalArgumentException("Student not found with ID: " + studentId));
-
         return new StudentDTO(
                 student.getId(),
                 student.getUser().getFirstName(),
@@ -68,7 +61,8 @@ public class StudentExportService {
                 student.getStudentIndex(),
                 student.getYearOfStudy(),
                 student.getFaculty(),
-                student.getSpecialization()
+                student.getSpecialization(),
+                student.getGroup() != null ? student.getGroup().getId() : null
         );
     }
 

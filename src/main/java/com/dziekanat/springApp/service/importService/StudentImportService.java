@@ -1,9 +1,11 @@
 package com.dziekanat.springApp.service.importService;
 
 import com.dziekanat.springApp.dto.StudentDTO;
+import com.dziekanat.springApp.model.Group;
 import com.dziekanat.springApp.model.Role;
 import com.dziekanat.springApp.model.Student;
 import com.dziekanat.springApp.model.User;
+import com.dziekanat.springApp.repository.GroupRepository;
 import com.dziekanat.springApp.repository.StudentRepository;
 import com.dziekanat.springApp.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,16 +23,18 @@ import java.util.Optional;
 public class StudentImportService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmployeeImportService.class);
+    private final GroupRepository groupRepository;
 
     private StudentRepository studentRepository;
     private UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public StudentImportService(ObjectMapper objectMapper, UserRepository userRepository, StudentRepository studentRepository) {
+    public StudentImportService(ObjectMapper objectMapper, UserRepository userRepository, StudentRepository studentRepository, GroupRepository groupRepository) {
         this.objectMapper = objectMapper;
         this.userRepository = userRepository;
         this.studentRepository = studentRepository;
+        this.groupRepository = groupRepository;
     }
 
     public Student importStudent(StudentDTO studentDTO) {
@@ -65,20 +69,26 @@ public class StudentImportService {
         student.setFaculty(studentDTO.getFaculty());
         student.setSpecialization(studentDTO.getSpecialization());
 
+        if (studentDTO.getGroupId() != null) {
+            Optional<Group> group = groupRepository.findById(studentDTO.getGroupId());
+            group.ifPresent(student::setGroup);
+        } else {
+            student.setGroup(null);
+        }
+
         logger.debug("Saving employee: User ID={}, StudentIndex={}, Faculty={}, YearOfStudy={}, Specialization={}",
                 user.getId(), student.getStudentIndex(), student.getFaculty(), student.getYearOfStudy(), student.getSpecialization());
 
         return studentRepository.save(student);
     }
 
-    public List<Student> importStudents(List<StudentDTO> studentDTOs) {
+    public void importStudents(List<StudentDTO> studentDTOs) {
         logger.info("Importing a list of {} students", studentDTOs.size());
 
         List<Student> students = studentDTOs.stream()
                 .map(this::importStudent)
                 .toList();
         logger.info("Successfully imported {} students", students.size());
-        return students;
     }
 
     public void importStudentsFromJson(File jsonFile) throws IOException {
