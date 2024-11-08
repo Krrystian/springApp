@@ -39,6 +39,7 @@ public class ImportController {
 
     @PostMapping("/students")
     public ResponseEntity<Void> importStudentsFromJson(@RequestParam("file") MultipartFile jsonFile) throws IOException {
+        logger.info("Importing students {}", jsonFile.getOriginalFilename());
         File tempFile = convertMultipartFileToFile(jsonFile);
         studentImportService.importStudentsFromJson(tempFile);
         deleteTempFile(tempFile);

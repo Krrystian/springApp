@@ -1,6 +1,8 @@
 package com.dziekanat.springApp.controller;
 
 import com.dziekanat.springApp.dto.EmployeeDTO;
+import com.dziekanat.springApp.dto.StudentDTO;
+import com.dziekanat.springApp.model.Student;
 import com.dziekanat.springApp.service.exportService.EmployeeExportService;
 import com.dziekanat.springApp.service.exportService.StudentExportService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +30,6 @@ public class ExportController {
         this.objectMapper = new ObjectMapper();
     }
 
-    // Endpoint do eksportowania wszystkich pracowników do pliku JSON
     @GetMapping("/employees")
     public ResponseEntity<String> exportAllEmployees(@RequestParam String filePath) {
         List<EmployeeDTO> employees = employeeExportService.exportAllEmployees();
@@ -40,7 +41,6 @@ public class ExportController {
         }
     }
 
-    // Endpoint do eksportowania pracowników wg wydziału do pliku JSON
     @GetMapping("/employees/faculty/{faculty}")
     public ResponseEntity<String> exportEmployeesByFaculty(@PathVariable String faculty, @RequestParam String filePath) {
         List<EmployeeDTO> employees = employeeExportService.exportEmployeesByFaculty(faculty);
@@ -52,7 +52,6 @@ public class ExportController {
         }
     }
 
-    // Endpoint do eksportowania pracowników wg stanowiska do pliku JSON
     @GetMapping("/employees/position/{position}")
     public ResponseEntity<String> exportEmployeesByPosition(@PathVariable String position, @RequestParam String filePath) {
         List<EmployeeDTO> employees = employeeExportService.exportEmployeesByPosition(position);
@@ -64,7 +63,6 @@ public class ExportController {
         }
     }
 
-    // Endpoint do eksportowania pracownika wg ID do pliku JSON
     @GetMapping("/employees/{id}")
     public ResponseEntity<String> exportEmployeeById(@PathVariable Integer id, @RequestParam String filePath) {
         EmployeeDTO employee = employeeExportService.exportEmployeeById(id);
@@ -76,11 +74,11 @@ public class ExportController {
         }
     }
 
-    // Endpointy dla studentów działają tak samo jak wcześniej
     @GetMapping("/students/all")
     public ResponseEntity<String> exportAllStudents(@RequestParam String filePath) {
+        List<StudentDTO> students = studentExportService.exportAllStudents();
         try {
-            studentExportService.exportAllStudents(filePath);
+            objectMapper.writeValue(new File(filePath), students);
             return ResponseEntity.ok("Export of all students successful to file: " + filePath);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error exporting students: " + e.getMessage());
@@ -89,8 +87,9 @@ public class ExportController {
 
     @GetMapping("/students/names")
     public ResponseEntity<String> exportAllStudentsNames(@RequestParam String filePath) {
+        List<StudentDTO> studentsNames = studentExportService.exportAllStudentsNamesAndSurnames();
         try {
-            studentExportService.exportAllStudentsNamesAndSurnames(filePath);
+            objectMapper.writeValue(new File(filePath), studentsNames);
             return ResponseEntity.ok("Export of student names and surnames successful to file: " + filePath);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error exporting student names: " + e.getMessage());
@@ -99,8 +98,9 @@ public class ExportController {
 
     @GetMapping("/students/{id}")
     public ResponseEntity<String> exportStudentById(@PathVariable Integer id, @RequestParam String filePath) {
+        StudentDTO student = studentExportService.exportStudentById(id);
         try {
-            studentExportService.exportStudentById(id, filePath);
+            objectMapper.writeValue(new File(filePath), student);
             return ResponseEntity.ok("Export of student by ID successful to file: " + filePath);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error exporting student by ID: " + e.getMessage());
@@ -109,8 +109,9 @@ public class ExportController {
 
     @GetMapping("/students/group/{groupId}")
     public ResponseEntity<String> exportStudentsByGroupId(@PathVariable Integer groupId, @RequestParam String filePath) {
+        List<String> students = studentExportService.exportStudentsByGroupId(groupId);
         try {
-            studentExportService.exportStudentsByGroupId(groupId, filePath);
+            objectMapper.writeValue(new File(filePath), students);
             return ResponseEntity.ok("Export of students by group ID successful to file: " + filePath);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error exporting students by group ID: " + e.getMessage());

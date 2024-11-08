@@ -1,5 +1,6 @@
 package com.dziekanat.springApp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,7 @@ public class Group {
     private Set<Class> classes;
 
     @OneToMany(mappedBy = "group")
+    @JsonIgnore
     private Set<Student> students;
 
     public Group() {

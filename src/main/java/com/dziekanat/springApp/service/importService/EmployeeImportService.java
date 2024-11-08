@@ -22,12 +22,6 @@ public class EmployeeImportService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmployeeImportService.class);
 
-<<<<<<< HEAD
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    public Employee importEmployee(EmployeeDTO employeeDTO) {
-        User user = userRepository.findById(employeeDTO.getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
-=======
     private final EmployeeRepository employeeRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
@@ -71,7 +65,6 @@ public class EmployeeImportService {
         }
 
         // Create and save Employee entity
->>>>>>> 69a9b9b1ba35a88197d97df1ded1a93c25c5f828
         Employee employee = new Employee();
         employee.setUser(user);
         employee.setPosition(employeeDTO.getPosition());
@@ -86,11 +79,8 @@ public class EmployeeImportService {
 
 
     public List<Employee> importEmployees(List<EmployeeDTO> employeeDTOs) {
-<<<<<<< HEAD
-=======
         logger.info("Importing a list of {} employees", employeeDTOs.size());
 
->>>>>>> 69a9b9b1ba35a88197d97df1ded1a93c25c5f828
         List<Employee> employees = employeeDTOs.stream()
                 .map(this::importEmployee)
                 .toList();
