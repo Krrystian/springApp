@@ -1,5 +1,6 @@
 package com.dziekanat.springApp.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,12 +11,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class StudentDTO extends UserDTO {
     private String studentIndex;
     private Integer yearOfStudy;
     private String faculty;
     private String specialization;
-    private String fullName;
 
     public StudentDTO(Integer id, String firstName, String lastName, String username, String studentIndex, Integer yearOfStudy, String faculty, String specialization) {
         super(id, firstName, lastName, username);
@@ -24,9 +25,6 @@ public class StudentDTO extends UserDTO {
         this.faculty = faculty;
         this.specialization = specialization;
     }
-    public StudentDTO(String studentIndex) {
-        this.studentIndex = studentIndex;
-        this.fullName = getFullName();
-    }
+
 }
 

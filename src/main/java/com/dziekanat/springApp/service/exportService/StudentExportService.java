@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentExportService {
@@ -23,27 +24,55 @@ public class StudentExportService {
         this.objectMapper = new ObjectMapper();
     }
 
-    public void exportAllStudentsNamesAndSurnames(String filePath) throws IOException {
+    public List<StudentDTO> exportAllStudentsNamesAndSurnames() {
         List<Student> students = studentRepository.findAll();
         List<StudentDTO> studentNames = students.stream()
-                .map(student -> new StudentDTO(student.getStudentIndex()))
-                .toList();
-        objectMapper.writeValue(new File(filePath), studentNames);
+                .map(student -> new StudentDTO(
+                        student.getId(),
+                        student.getUser().getFirstName(),
+                        student.getUser().getLastName(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                )).toList();
+        return studentNames;
     }
 
-    public void exportAllStudents(String filePath) throws IOException {
+    public List<StudentDTO> exportAllStudents() {
         List<Student> students = studentRepository.findAll();
-        objectMapper.writeValue(new File(filePath), students);
+
+        return students.stream()
+                .map(student -> new StudentDTO(
+                            student.getId(),
+                            student.getUser().getFirstName(),
+                            student.getUser().getLastName(),
+                            student.getUser().getUsername(),
+                            student.getStudentIndex(),
+                            student.getYearOfStudy(),
+                            student.getFaculty(),
+                            student.getSpecialization()
+                )).collect(Collectors.toList());
     }
 
-    public void exportStudentById(Integer studentId, String filePath) throws IOException {
+    public StudentDTO exportStudentById(Integer studentId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new IllegalArgumentException("Student not found with ID: " + studentId));
-        objectMapper.writeValue(new File(filePath), student);
+
+        return new StudentDTO(
+                student.getId(),
+                student.getUser().getFirstName(),
+                student.getUser().getLastName(),
+                student.getUser().getUsername(),
+                student.getStudentIndex(),
+                student.getYearOfStudy(),
+                student.getFaculty(),
+                student.getSpecialization()
+        );
     }
 
-    public void exportStudentsByGroupId(Integer groupId, String filePath) throws IOException {
-        List<String> students = studentRepository.findByGroupId(groupId);
-        objectMapper.writeValue(new File(filePath), students);
+    public List<String> exportStudentsByGroupId(Integer groupId) {
+        return studentRepository.findByGroupId(groupId);
     }
 }

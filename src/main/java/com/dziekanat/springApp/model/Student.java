@@ -1,5 +1,6 @@
 package com.dziekanat.springApp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class Student {
 
     @ManyToOne
     @JoinColumn(name = "group_id", referencedColumnName = "id")
+    @JsonIgnore
     private Group group;
 
     @Column(name = "student_index", unique = true, nullable = false)
