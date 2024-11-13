@@ -13,4 +13,7 @@ public interface ClassRepository extends JpaRepository<Class, Integer> {
 
     @Query("SELECT c FROM Class c WHERE c.employee.id = :employeeId")
     List<Class> findByEmployeeId(Integer employeeId);
+
+    @Query("SELECT c FROM Class c WHERE c.name =:name")
+    Optional<Class> findByName(String name);
 }

@@ -4,6 +4,7 @@ import com.dziekanat.springApp.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,4 +15,6 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     @Query("SELECT s FROM Student s WHERE s.user.username = :username")
     Optional<Student> findByUserUsername(String username);
 
+    @Query("SELECT s FROM Student s WHERE s.studentIndex = :index")
+    Optional<Student> findByIndex(String index);
 }

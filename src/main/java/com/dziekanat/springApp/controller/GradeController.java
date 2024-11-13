@@ -7,6 +7,7 @@ import com.dziekanat.springApp.model.Class;
 import com.dziekanat.springApp.repository.GradeRepository;
 import com.dziekanat.springApp.repository.StudentRepository;
 import com.dziekanat.springApp.repository.ClassRepository;
+import io.jsonwebtoken.lang.Classes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -142,5 +143,34 @@ public class GradeController {
                 grade.getDate()
         )).collect(Collectors.toList());
         return ResponseEntity.ok(gradeDTOs);
+    }
+    @PostMapping("/student/index")
+    public ResponseEntity<GradeDTO> createGradeForStudentIndex(@RequestBody Grade grade, @RequestParam String studentIndex, @RequestParam String className) {
+        Optional<Student> studentOptional = studentRepository.findByIndex(studentIndex);
+        if (studentOptional.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        Optional<Class> classOptional = classRepository.findByName(className);
+        if (classOptional.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        grade.setStudent(studentOptional.get());
+        grade.setClasses(classOptional.get());
+        if (grade.getDate() == null) {
+            grade.setDate(LocalDate.now());
+        }
+
+        Grade savedGrade = gradeRepository.save(grade);
+
+        GradeDTO responseDTO = new GradeDTO(
+                savedGrade.getId(),
+                savedGrade.getStudent().getFullName(),
+                savedGrade.getClasses().getName(),
+                savedGrade.getGrade(),
+                savedGrade.getDate()
+        );
+        return ResponseEntity.ok(responseDTO);
+
     }
 }
