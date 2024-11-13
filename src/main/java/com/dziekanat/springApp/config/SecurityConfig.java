@@ -59,9 +59,8 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**", "/grades", "/export/**", "/import/**").hasAuthority("ADMIN")
                         .requestMatchers("/grades/class/**", "/grades/student/**").hasAnyAuthority("ADMIN", "PRACOWNIK")
 
-
+                        .requestMatchers("/student/profile/grades").hasAuthority("STUDENT")
                         .requestMatchers("/student/**", "/announcement/**", "/group/**", "/classes/**", "/employee/**").hasAnyAuthority("STUDENT", "ADMIN", "PRACOWNIK")
-                        .requestMatchers("/grades/student/**").hasAuthority("STUDENT")
 
                         .anyRequest().authenticated()
                 )

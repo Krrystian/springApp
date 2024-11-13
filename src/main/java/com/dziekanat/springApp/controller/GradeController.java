@@ -51,15 +51,17 @@ public class GradeController {
     public ResponseEntity<GradeDTO> createGrade(@RequestBody Grade grade, @RequestParam Integer studentId, @RequestParam Integer classId) {
         Optional<Student> studentOptional = studentRepository.findById(studentId);
         Optional<Class> classOptional = classRepository.findById(classId);
-
+        logger.info("Creating grade: {}", grade.getGrade());
+        logger.info("Student id: {}", studentId);
+        logger.info("Class id: {}", classId);
         if (studentOptional.isPresent() && classOptional.isPresent()) {
             if (grade.getDate() == null) {
                 grade.setDate(LocalDate.now());
             }
             grade.setStudent(studentOptional.get());
             grade.setClasses(classOptional.get());
-
             Grade savedGrade = gradeRepository.save(grade);
+
             GradeDTO responseDTO = new GradeDTO(
                     savedGrade.getId(),
                     savedGrade.getStudent().getFullName(),
@@ -129,6 +131,7 @@ public class GradeController {
 
     @GetMapping("/student/{studentId}")
     public ResponseEntity<List<GradeDTO>> getGradesByStudent(@PathVariable Integer studentId) {
+
         List<Grade> grades = gradeRepository.findAllByStudentId(studentId);
 
         List<GradeDTO> gradeDTOs = grades.stream().map(grade -> new GradeDTO(
@@ -138,17 +141,6 @@ public class GradeController {
                 grade.getGrade(),
                 grade.getDate()
         )).collect(Collectors.toList());
-
-        //ewentualnie stworzyć nowy konstruktor z samymi informacjami o ocenach i klasach?
-        /*
-        List<GradeDTO> gradeDTOs = grades.stream().map(grade -> new GradeDTO(
-                grade.getId(),
-                grade.getStudent().getId(),
-                grade.getClasses().getId(),
-                grade.getGrade(),
-                grade.getDate()
-        )).collect(Collectors.toList());
-         */
         return ResponseEntity.ok(gradeDTOs);
     }
 }
