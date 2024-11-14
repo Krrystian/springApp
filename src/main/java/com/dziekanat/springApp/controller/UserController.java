@@ -13,7 +13,7 @@ public class UserController {
     public String getUsers(){
         return "Not secured";
     }
-    @GetMapping("getAdmin")
+    @GetMapping("/getAdmin")
     public String getAdmins(@AuthenticationPrincipal UserDetails userDetails){
         return "Secured, welcome " + userDetails.getUsername();
     }
