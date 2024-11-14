@@ -146,6 +146,11 @@ public class GradeController {
     }
     @PostMapping("/student/index")
     public ResponseEntity<GradeDTO> createGradeForStudentIndex(@RequestBody Grade grade, @RequestParam String studentIndex, @RequestParam String className) {
+        logger.info("StudentIndex: {}", studentIndex);
+        logger.info("className: {}", className);
+
+        className = URLDecoder.decode(className, StandardCharsets.UTF_8);
+        
         Optional<Student> studentOptional = studentRepository.findByIndex(studentIndex);
         if (studentOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
