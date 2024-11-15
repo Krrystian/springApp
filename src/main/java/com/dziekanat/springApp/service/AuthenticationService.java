@@ -1,22 +1,20 @@
 package com.dziekanat.springApp.service;
 
 
-import com.dziekanat.springApp.model.Admin;
+import com.dziekanat.springApp.dto.UserRequest;
 import com.dziekanat.springApp.model.AuthenticationResponse;
 import com.dziekanat.springApp.model.Token;
 import com.dziekanat.springApp.model.User;
-import com.dziekanat.springApp.repository.AdminRepository;
 import com.dziekanat.springApp.repository.TokenRepository;
 import com.dziekanat.springApp.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +44,7 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthenticationResponse register(User request) {
+    public AuthenticationResponse register(@Valid UserRequest request) {
 
         if(repository.findByUsername(request.getUsername()).isPresent()) {
             return new AuthenticationResponse(null, null,"User already exist", null);
