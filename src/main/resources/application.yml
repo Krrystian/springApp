@@ -19,3 +19,4 @@ application:
       secret-key: 4bb6a6dfbafb64a681239d1586b6f1160b18159afd57c8c79136d7490630401d
       access-token-expiration: 86400000
       refresh-token-expiration: 604800000
+
