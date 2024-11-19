@@ -27,4 +27,22 @@ public class TestHelper {
         String response = result.getResponse().getContentAsString();
         return JsonPath.read(response, "$.access_token");
     }
+
+    public static String obtainAccessTokenAdmin(MockMvc mockMvc) throws Exception {
+        String requestBody = """
+            {
+              "username": "a.kowalski",
+              "password": "passwd123"
+            }
+        """;
+
+        MvcResult result = mockMvc.perform(post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        return JsonPath.read(response, "$.access_token");
+    }
 }
