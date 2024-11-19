@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/announcement/**", "/employee/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/group/**", "/classes/**", "/grades/**").hasAnyAuthority("ADMIN", "PRACOWNIK")
 
+                        .requestMatchers("/export/students/download/android").hasAuthority("PRACOWNIK")
                         .requestMatchers("/admin/**", "/grades", "/export/**", "/import/**").hasAuthority("ADMIN")
                         .requestMatchers("/grades/class/**", "/grades/student/**").hasAnyAuthority("ADMIN", "PRACOWNIK")
 

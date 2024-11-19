@@ -2,17 +2,21 @@ package com.dziekanat.springApp.controller;
 
 import com.dziekanat.springApp.dto.EmployeeDTO;
 import com.dziekanat.springApp.dto.StudentDTO;
-import com.dziekanat.springApp.model.Student;
 import com.dziekanat.springApp.service.exportService.EmployeeExportService;
 import com.dziekanat.springApp.service.exportService.StudentExportService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 @RestController
@@ -22,6 +26,8 @@ public class ExportController {
     private final EmployeeExportService employeeExportService;
     private final StudentExportService studentExportService;
     private final ObjectMapper objectMapper;
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+
 
     @Autowired
     public ExportController(EmployeeExportService employeeExportService, StudentExportService studentExportService) {
@@ -84,6 +90,45 @@ public class ExportController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error exporting students: " + e.getMessage());
         }
     }
+
+    @GetMapping("/students/download/android")
+    public ResponseEntity<Resource> downloadAllStudents() {
+        logger.info("Metoda downloadAllStudents została wywołana");
+
+        List<StudentDTO> students = studentExportService.exportAllStudents();
+        try {
+            File tempFile = File.createTempFile("students", ".txt");
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+                for (StudentDTO student : students) {
+                    writer.write(String.format(
+                            "ID: %d, Name: %s %s, Username: %s, Index: %s, Year: %d, Faculty: %s, Specialization: %s, GroupID: %s%n",
+                            student.getId(),
+                            student.getFirstName(),
+                            student.getLastName(),
+                            student.getUsername(),
+                            student.getStudentIndex(),
+                            student.getYearOfStudy(),
+                            student.getFaculty(),
+                            student.getSpecialization(),
+                            student.getGroupId() != null ? student.getGroupId() : "None"
+                    ));
+                }
+            }
+
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(tempFile));
+            logger.debug("Plik tymczasowy został utworzony: {}", tempFile.getAbsolutePath());
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=students.txt")
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body(resource);
+        } catch (IOException e) {
+            logger.error("Wystąpił błąd podczas eksportu studentów", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 
     @GetMapping("/students/names")
     public ResponseEntity<String> exportAllStudentsNames(@RequestParam String filePath) {
