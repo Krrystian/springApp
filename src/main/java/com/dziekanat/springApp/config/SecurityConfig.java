@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +44,8 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
+                        .requestMatchers("/login/**", "/register/**", "/refresh_token/**", "/user/getAll",
+                                "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/login/**", "/register/**", "/refresh_token/**", "/user/getAll").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/student/**", "/group/**", "/classes/**").hasAnyAuthority("ADMIN","PRACOWNIK")
@@ -56,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/announcement/**", "/employee/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/group/**", "/classes/**", "/grades/**").hasAnyAuthority("ADMIN", "PRACOWNIK")
 
+                        .requestMatchers("/export/students/download/android").hasAuthority("PRACOWNIK")
                         .requestMatchers("/admin/**", "/grades", "/export/**", "/import/**").hasAuthority("ADMIN")
                         .requestMatchers("/grades/class/**", "/grades/student/**","/user/getAdmin").hasAnyAuthority("ADMIN", "PRACOWNIK")
 
