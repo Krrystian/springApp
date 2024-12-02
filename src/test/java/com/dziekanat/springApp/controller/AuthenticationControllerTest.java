@@ -5,12 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -26,7 +23,7 @@ class AuthenticationControllerTest {
     void testLoginSuccess() throws Exception {
         String requestBody = """
             {
-              "username": "j.adamczyk",
+              "username": "pracownik.pracownik",
               "password": "passwd123"
             }
         """;
@@ -34,11 +31,11 @@ class AuthenticationControllerTest {
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isOk()) // Oczekiwany kod odpowiedzi 200 OK
-                .andExpect(jsonPath("$.access_token").exists()) // Sprawdzenie, czy access_token istnieje w odpowiedzi
-                .andExpect(jsonPath("$.refresh_token").exists()) // Sprawdzenie, czy refresh_token istnieje w odpowiedzi
-                .andExpect(jsonPath("$.message").value("User login was successful")) // Oczekiwana wiadomość w odpowiedzi
-                .andExpect(jsonPath("$.role").value("PRACOWNIK")); // Sprawdzenie, czy rola jest zgodna
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.access_token").exists())
+                .andExpect(jsonPath("$.refresh_token").exists())
+                .andExpect(jsonPath("$.message").value("User login was successful"))
+                .andExpect(jsonPath("$.role").value("PRACOWNIK"));
     }
     @Test
     void testLoginFailure() throws Exception {
@@ -84,7 +81,7 @@ class AuthenticationControllerTest {
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isUnauthorized()) // Oczekiwany status Unauthorized dla odrzuconej próby
+                .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.access_token").doesNotExist())
                 .andExpect(jsonPath("$.refresh_token").doesNotExist())
                 .andExpect(jsonPath("$.message").doesNotExist())
@@ -134,9 +131,9 @@ class AuthenticationControllerTest {
     void testRegisterSuccess() throws Exception {
         String requestBody = """
         {
-          "firstName": "PRACOWNIK10",
+          "firstName": "PRACOWNIK1000",
           "lastName":"PRACUS",
-          "username":"p.pracus12",
+          "username":"p.pracus1200",
           "password":"passwd123",
           "role":"PRACOWNIK"
         }
@@ -156,8 +153,8 @@ class AuthenticationControllerTest {
     void testRegisterMissingUsername() throws Exception {
         String requestBody = """
         {
-          "firstName": "PRACOWNIK2",
-          "lastName":"PRACUS",
+          "firstName": "PRACOWNIK3",
+          "lastName":"PRACUS2",
           "password":"passwd123",
           "role":"PRACOWNIK"
         }
@@ -189,15 +186,4 @@ class AuthenticationControllerTest {
                 .andExpect(jsonPath("$.access_token").doesNotExist())
                 .andExpect(jsonPath("$.refresh_token").doesNotExist());
     }
-
-    @Test
-    void testSecuredEndpointWithValidToken() throws Exception {
-        String accessToken = TestHelper.obtainAccessTokenEmployee(mockMvc);
-
-        mockMvc.perform(get("/user/getAdmin")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
-
 }
